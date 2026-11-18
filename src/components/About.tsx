@@ -123,39 +123,65 @@ export default function About() {
       ease: "power2.out",
       paused: true,
     });
-    // EXIT B (time-based once, disetujui 2026-11-18): dari tengah, scroll
-    // lagi = fire sekali (latch exitPlayed). URUTAN TERBALIK dari entrance
-    // (headline → bio → sinyal MASUK; sinyal → bio → headline KELUAR):
-    // kata naik per-kata dulu 0.7 (delay 0), char headline naik per-huruf
-    // 0.9 (delay 0.35), container fade 0.8 TERAKHIR (delay 0.55, power1.out)
-    // — tak menelan animasi char/word. Total ≈1.35 dtk sampai lenyap.
-    // LUBANG: fade HALUS 1.2 dtk ke 0.15 via setHoleVis (sisa samar, langit
-    // tetap hidup — bukan kill total). Ambang fire = Y1400 (about tengah
-    // penuh di Y900, satu ketukan scroll ±500px kemudian = keluar).
-    // Reset kembalikan semua. Mobile/RM: tanpa exit, alir natural.
+    // EXIT B (time-based once, disetujui 2026-11-18; revisi2: ambang maju ke
+    // Y1200 — bukti screenshot: di Y1600 about sudah keluar frame (viewport
+    // hanya sisa 200px bawah), animasi jalan di area tak terlihat. Di Y1200
+    // about masih ~penuh di layar (probe headTop −52) → koreografi terbaca.
+    // Durasi ±1.8 dtk: kata 1.0 (delay 0) → char 1.2 (delay 0.5, stagger
+    // 0.05) → container fade 1.0 (delay 0.8). LUBANG: fade 1.2 dtk ke 0.15
+    // via setHoleVis. Desktop saja (mobile/RM: alir natural). Reset dekat:
+    // scroll < Y1000 (= kembali ke tengah dari bawah) replay bersih.
     let exitPlayed = false;
     const exitState = { hole: 1 };
+    // Tween anonim exit (container fade + lubang) WAJIB terlacak agar
+    // resetEntrance bisa kill: tanpa ini, fade exit basi menimpa replay
+    // entrance (teks replay → 1 lalu dipaksa 0 oleh tween basi).
     const outro = gsap.to(HEAD_CHARS, {
       yPercent: -115,
-      duration: 0.9,
-      stagger: 0.035,
+      duration: 1.2,
+      stagger: 0.05,
       ease: "power3.in",
       paused: true,
-      delay: 0.35,
+      delay: 0.5,
     });
     const wordRise = gsap.to(".about-text .word", {
       yPercent: -110,
-      duration: 0.7,
-      stagger: 0.006,
+      duration: 1.0,
+      stagger: 0.008,
       ease: "power2.in",
       paused: true,
     });
+    // ROOT CAUSE (probe-fixed 2026-11-18): di T0 wordY masih -44.8 =
+    // entrance BELUM SELESAI saat anchor mendarat, tapi tryExit langsung
+    // fire di Y1200 → outro/wordRise tabrakan dengan intro/wordDrop yang
+    // masih jalan (char rewind 0→-55→0, kata macet -44.8, container fade
+    // ke 0 duluan). Hasil: teks lenyap TANPA koreografi naik-menghilang.
+    // FLAG TABRAKAN: di replay siklus ini, polling berikutnya introDone
+    // sudah true (flag tak ikut resetEntrance) → exit fire SAAT kata masih
+    // di tengah (T1) → wordRise menimpa wordDrop: kata naik SEKALIGUS turun
+    // = wordY macet -23.3. Kata "dibekukan di antara dua arah".
+    // introPlayed = "sudah MULAI" (salah jadi syarat); yang benar =
+    // introDone ("sudah SELESAI", set di onComplete intro — intro 0.9dtk +
+    // stagger char adalah tween entrance TERPANJANG, jadi introDone ≈
+    // semua selesai). Exit tunggu entrance selesai via polling 150ms.
+    // SYARAT VOTE: introDone SAJA tak cukup — replay dari reset dekat
+    // (scroll 1400→1200) memicu tryFire + tryExit di polling BERIKUTNYA
+    // (150ms kemudian): entrance REPLAY belum selesai tapi exit langsung
+    // fire → tabrakan lagi. Syarat penuh = introDone DAN roll BERJALAN
+    // (roll.play() hanya di onComplete intro = bukti entrance selesai di
+    // SIKLUS INI, bukan flag basi dari siklus sebelumnya).
     const tryExit = () => {
-      if (exitPlayed || !introPlayed) return;
-      if ((window.scrollY || 0) >= 1400) {
+      if (exitPlayed || !introDone || !roll.isActive()) return;
+      if ((window.scrollY || 0) >= 1200) {
         exitPlayed = true;
+        // PUTUS TOTAL tween entrance yang mungkin basi/masih jalan:
+        // tanpa kill, wordDrop basi menimpa wordRise (kata macet -23.3,
+        // bukti probe-T2 siklus replay). Kill + invalidate agar replay
+        // entrance berikutnya mulai dari bersih.
+        intro.kill();
+        wordDrop.kill();
         roll.pause();
-        gsap.to(".about-text", { opacity: 0, duration: 0.8, delay: 0.55, ease: "power1.out" });
+        gsap.to(".about-text", { opacity: 0, duration: 1.0, delay: 0.8, ease: "power1.out" });
         outro.play();
         wordRise.play();
         exitState.hole = 1;
@@ -288,15 +314,17 @@ export default function About() {
     });
     // Polling 150ms anti-lompat (onUpdate scrub fire sekali saat scroll
     // instan). Latch introPlayed = entrance sekali main; exitPlayed =
-    // exit sekali main (fire di Y1400, scroll balik = tetap hilang).
-    // Reset saat kembali ke atas (Y≤36) agar replay dari bersih.
+    // exit sekali main (fire di Y1600, scroll balik = tetap hilang).
+    // RESET DEKAT (revisi keluhan "harus ke paling atas"): scroll < Y1400
+    // (= about kembali ke tengah dari bawah) = entrance replay dari bersih.
+    // Y≤36 tetap tercakup (< 1400). Anchor nav reset paksa seperti biasa.
     const poll = window.setInterval(() => {
       if (!introPlayed) {
         tryFire();
       } else if (!exitPlayed) {
         tryExit();
       }
-      if (introPlayed && (window.scrollY || 0) <= 36) {
+      if (introPlayed && (window.scrollY || 0) < 1000) {
         resetEntrance();
       }
     }, 150);

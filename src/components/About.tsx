@@ -156,31 +156,21 @@ export default function About() {
     // fire di Y1200 → outro/wordRise tabrakan dengan intro/wordDrop yang
     // masih jalan (char rewind 0→-55→0, kata macet -44.8, container fade
     // ke 0 duluan). Hasil: teks lenyap TANPA koreografi naik-menghilang.
-    // FLAG TABRAKAN: di replay siklus ini, polling berikutnya introDone
-    // sudah true (flag tak ikut resetEntrance) → exit fire SAAT kata masih
-    // di tengah (T1) → wordRise menimpa wordDrop: kata naik SEKALIGUS turun
-    // = wordY macet -23.3. Kata "dibekukan di antara dua arah".
-    // introPlayed = "sudah MULAI" (salah jadi syarat); yang benar =
-    // introDone ("sudah SELESAI", set di onComplete intro — intro 0.9dtk +
-    // stagger char adalah tween entrance TERPANJANG, jadi introDone ≈
-    // semua selesai). Exit tunggu entrance selesai via polling 150ms.
-    // SYARAT VOTE: introDone SAJA tak cukup — replay dari reset dekat
-    // (scroll 1400→1200) memicu tryFire + tryExit di polling BERIKUTNYA
-    // (150ms kemudian): entrance REPLAY belum selesai tapi exit langsung
-    // fire → tabrakan lagi. Syarat penuh = introDone DAN roll BERJALAN
-    // (roll.play() hanya di onComplete intro = bukti entrance selesai di
-    // SIKLUS INI, bukan flag basi dari siklus sebelumnya).
+    // SOLUSI (revisi): JADWAL, bukan flag — exit dijadwalkan SELALU di
+    // belakang entrance siklus ini via timer dari tryFire (3.0dtk ≈
+    // entrance terpanjang 1.65dtk + margin). Reset membatalkan jadwal
+    // basi (clearTimeout). Tak ada flag basi yang bisa lolos.
+    // SYARAT GANDA di tryExit: timer matang (exitArmed) DAN scroll ≥1200.
+    // Timer saja tanpa scroll = user diam di tengah → exit tak fire.
+    // Scroll saja tanpa timer = entrance belum selesai → tunggu.
+    let exitArmed = false;
+    let exitTimer: number | undefined;
     const tryExit = () => {
-      if (exitPlayed || !introDone || !roll.isActive()) return;
+      if (exitPlayed || !exitArmed) return;
       if ((window.scrollY || 0) >= 1200) {
         exitPlayed = true;
-        // PUTUS TOTAL tween entrance yang mungkin basi/masih jalan:
-        // tanpa kill, wordDrop basi menimpa wordRise (kata macet -23.3,
-        // bukti probe-T2 siklus replay). Kill + invalidate agar replay
-        // entrance berikutnya mulai dari bersih.
-        intro.kill();
-        wordDrop.kill();
         roll.pause();
+        wordDrop.pause();
         gsap.to(".about-text", { opacity: 0, duration: 1.0, delay: 0.8, ease: "power1.out" });
         outro.play();
         wordRise.play();
@@ -209,10 +199,20 @@ export default function About() {
       const aboutTop = document.getElementById("about")?.getBoundingClientRect().top ?? 9999;
       if (heroOp <= 0.05 && aboutTop <= window.innerHeight * 0.4 && !introPlayed) {
         introPlayed = true;
+        introDone = false;
+        exitPlayed = false;
+        // Jadwalkan exit SELALU di belakang entrance siklus ini: 3.0dtk ≈
+        // entrance terpanjang (1.65dtk) + margin scroll manusiawi. Jadwal
+        // basi siklus sebelumnya dibatalkan dulu (clearTimeout + disarm).
+        window.clearTimeout(exitTimer);
+        exitArmed = false;
+        exitTimer = window.setTimeout(() => {
+          exitArmed = true;
+        }, 3000);
         gsap.to(".about-text", { opacity: 1, duration: 0.4, ease: "power2.out" });
         headFade.play();
-        intro.play();
-        wordDrop.play();
+        intro.play(0);
+        wordDrop.play(0);
       }
     };
     // DESKTOP: rentang PIN hero (start 0 / end 900 = pin 1 viewport).
@@ -257,6 +257,8 @@ export default function About() {
       introPlayed = false;
       introDone = false;
       exitPlayed = false;
+      exitArmed = false;
+      window.clearTimeout(exitTimer);
       intro.pause(0);
       outro.pause(0);
       headFade.pause(0);
@@ -318,13 +320,20 @@ export default function About() {
     // RESET DEKAT (revisi keluhan "harus ke paling atas"): scroll < Y1400
     // (= about kembali ke tengah dari bawah) = entrance replay dari bersih.
     // Y≤36 tetap tercakup (< 1400). Anchor nav reset paksa seperti biasa.
+    // RESET (perbaikan loop 2026-11-18): syarat LAMA `scrollY < 1000`
+    // me-reset SETIAP 150ms saat diam di tengah (Y900 < 1000) → entrance
+    // restart terus, kata tak pernah jatuh penuh (probe SIAP wordY=-45
+    // setelah 3.5dtk stabil). Syarat BENAR: reset hanya bila kembali dari
+    // BAWAH setelah exit (exitPlayed) ATAU ke hero (Y≤36). Diam di tengah
+    // (Y900, exit belum fire) = jangan sentuh.
     const poll = window.setInterval(() => {
       if (!introPlayed) {
         tryFire();
       } else if (!exitPlayed) {
         tryExit();
       }
-      if (introPlayed && (window.scrollY || 0) < 1000) {
+      const y = window.scrollY || 0;
+      if (introPlayed && y < 1000 && (exitPlayed || y <= 36)) {
         resetEntrance();
       }
     }, 150);
@@ -340,6 +349,7 @@ export default function About() {
     return () => {
       document.removeEventListener("click", onNavAbout);
       window.clearInterval(poll);
+      window.clearTimeout(exitTimer);
       roll.kill();
       intro.kill();
       outro.kill();

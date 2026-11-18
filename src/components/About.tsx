@@ -123,8 +123,54 @@ export default function About() {
       ease: "power2.out",
       paused: true,
     });
-    // (Exit parallax DICABUT per permintaan — teks + lubang keluar natural
-    // mengikuti scroll mentah, tanpa fade/drift tambahan.)
+    // EXIT B (time-based once, disetujui 2026-11-18): dari tengah, scroll
+    // lagi = fire sekali (latch exitPlayed). URUTAN TERBALIK dari entrance
+    // (headline → bio → sinyal MASUK; sinyal → bio → headline KELUAR):
+    // kata naik per-kata dulu 0.7 (delay 0), char headline naik per-huruf
+    // 0.9 (delay 0.35), container fade 0.8 TERAKHIR (delay 0.55, power1.out)
+    // — tak menelan animasi char/word. Total ≈1.35 dtk sampai lenyap.
+    // LUBANG: fade HALUS 1.2 dtk ke 0.15 via setHoleVis (sisa samar, langit
+    // tetap hidup — bukan kill total). Ambang fire = Y1400 (about tengah
+    // penuh di Y900, satu ketukan scroll ±500px kemudian = keluar).
+    // Reset kembalikan semua. Mobile/RM: tanpa exit, alir natural.
+    let exitPlayed = false;
+    const exitState = { hole: 1 };
+    const outro = gsap.to(HEAD_CHARS, {
+      yPercent: -115,
+      duration: 0.9,
+      stagger: 0.035,
+      ease: "power3.in",
+      paused: true,
+      delay: 0.35,
+    });
+    const wordRise = gsap.to(".about-text .word", {
+      yPercent: -110,
+      duration: 0.7,
+      stagger: 0.006,
+      ease: "power2.in",
+      paused: true,
+    });
+    const tryExit = () => {
+      if (exitPlayed || !introPlayed) return;
+      if ((window.scrollY || 0) >= 1400) {
+        exitPlayed = true;
+        roll.pause();
+        gsap.to(".about-text", { opacity: 0, duration: 0.8, delay: 0.55, ease: "power1.out" });
+        outro.play();
+        wordRise.play();
+        exitState.hole = 1;
+        gsap.to(exitState, {
+          hole: 0.15,
+          duration: 1.2,
+          ease: "power1.out",
+          onUpdate: () => {
+            try {
+              (window as unknown as { __sceneHandle?: { setHoleVis: (v: number) => void } }).__sceneHandle?.setHoleVis(exitState.hole);
+            } catch { /* abaikan */ }
+          },
+        });
+      }
+    };
     // GATE ENTRANCE: hero lenyap (heroOp ≤ 0.05) DAN posisi about sudah
     // dekat tengah: rect top #about ≤ 40% viewport. BUKAN scroll absolut
     // (rapuh per tinggi layar) atau sisa-pin (anchor "top center" mendarat
@@ -184,10 +230,16 @@ export default function About() {
     const resetEntrance = () => {
       introPlayed = false;
       introDone = false;
+      exitPlayed = false;
       intro.pause(0);
+      outro.pause(0);
       headFade.pause(0);
       wordDrop.pause(0);
+      wordRise.pause(0);
       roll.pause(0);
+      try {
+        (window as unknown as { __sceneHandle?: { setHoleVis: (v: number) => void } }).__sceneHandle?.setHoleVis(1);
+      } catch { /* abaikan */ }
       gsap.set(".about-text", { opacity: 0 });
       gsap.set(".about-headline", { opacity: 0 });
       gsap.set(HEAD_CHARS, { yPercent: 0 });
@@ -235,11 +287,16 @@ export default function About() {
       onEnterBack: tryPlay,
     });
     // Polling 150ms anti-lompat (onUpdate scrub fire sekali saat scroll
-    // instan). Latch introPlayed = sekali main; reset saat kembali ke atas.
+    // instan). Latch introPlayed = entrance sekali main; exitPlayed =
+    // exit sekali main (fire di Y1400, scroll balik = tetap hilang).
+    // Reset saat kembali ke atas (Y≤36) agar replay dari bersih.
     const poll = window.setInterval(() => {
       if (!introPlayed) {
         tryFire();
-      } else if ((window.scrollY || 0) <= 36) {
+      } else if (!exitPlayed) {
+        tryExit();
+      }
+      if (introPlayed && (window.scrollY || 0) <= 36) {
         resetEntrance();
       }
     }, 150);
@@ -257,8 +314,10 @@ export default function About() {
       window.clearInterval(poll);
       roll.kill();
       intro.kill();
+      outro.kill();
       headFade.kill();
       wordDrop.kill();
+      wordRise.kill();
       gsap.set(HEAD_CHARS, { yPercent: 0 });
     };
   }, [reduced, desktop]);
@@ -284,7 +343,12 @@ export default function About() {
               <Words text={about.subtitle} />
             </p>
             <p className="about-signal">
-              <span className="about-signal-tag">▸ SIGNAL // 0047</span>
+              {/* Tag ikut wordRise/wordDrop: tanpa mask .word ia lolos exit
+                  (container fade delay 0.55 = masih terbaca saat section
+                  berikut masuk). Pola sama: .wmask + .word. */}
+              <span className="wmask" aria-hidden="true">
+                <span className="word about-signal-tag">▸ SIGNAL // 0047</span>
+              </span>
               <br />
               <span aria-label={about.quote}>
                 <Words text={about.quote} />

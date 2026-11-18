@@ -1,0 +1,60 @@
+/* ————————————————————————————————
+   JourneyFlightPath (J) · rel vertikal menggantikan garis lurus lama.
+   1 path + 1 marker; stop klik → entri terkait.
+   ———————————————————————————————— */
+
+.flight-rail {
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 20px;
+  pointer-events: none;
+}
+
+.flight-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.flight-path {
+  stroke: var(--line-soft);
+  stroke-width: 1;
+}
+
+.flight-marker {
+  fill: none;
+}
+
+.flight-ring {
+  stroke: var(--warm-starlight);
+  stroke-width: 1;
+  fill: var(--deep-space);
+}
+
+.flight-tri {
+  fill: var(--warm-starlight);
+}
+
+.flight-stop {
+  fill: var(--deep-space);
+  stroke: var(--warm-starlight);
+  stroke-width: 1;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.flight-stop:hover {
+  fill: var(--warm-starlight);
+}
+
+/* RM / tanpa JS gerak: marker parkir di waypoint pertama. */
+.flight-rm .flight-marker {
+  transform: translate(10px, 8px);
+}
+
+.flight-rm .flight-stop {
+  pointer-events: auto;
+}

@@ -1,0 +1,56 @@
+/* ————————————————————————————————————————————————
+   BEYOND THE EVENT HORIZON · design tokens
+   Satu-satunya sumber warna, tipografi, dan spacing.
+   ———————————————————————————————————————————————— */
+
+:root {
+  /* Palette — jangan tambah warna tanpa alasan komposisi */
+  --deep-space: #05070d;
+  --cosmic-navy: #101a2b;
+  --stellar-blue: #526c91;
+  --warm-starlight: #c4a477;
+  --nebula-white: #d9dce5;
+
+  /* Turunan yang diizinkan (opacity dari token di atas) */
+  --ink-dim: rgba(217, 220, 229, 0.62);
+  --ink-faint: rgba(217, 220, 229, 0.34);
+  --line: rgba(82, 108, 145, 0.28);
+  --line-soft: rgba(82, 108, 145, 0.14);
+
+  /* Gradasi teks hero: terang-atas (cahaya) → emas-bawah (cincin).
+     Hanya dua token ini; tanpa warna baru di luar palet. */
+  --grad-hero-light: #eef0f6;
+  --grad-hero-gold: #c4a477;
+
+  /* Typography */
+  --font-display: "Fraunces", "Georgia", serif;
+  --font-body: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "Cascadia Code", monospace;
+
+  --step-hero: clamp(3.4rem, 11vw, 10rem);
+  --step-h2: clamp(2.2rem, 5.4vw, 4.6rem);
+  --step-h3: clamp(1.35rem, 2.6vw, 2rem);
+  --step-lede: clamp(1.05rem, 1.6vw, 1.3rem);
+  --step-body: 1rem;
+  --step-micro: 0.72rem;
+
+  /* About: bio dibesarkan agar mengisi halaman (lede 1.3 → bio 1.75);
+     sinyal tetap mono tapi terbaca (micro 0.72 → 1.15). */
+  --step-about-bio: clamp(1.25rem, 2.2vw, 1.75rem);
+  --step-about-signal: clamp(0.95rem, 1.4vw, 1.15rem);
+  /* About ramping: panggung lubang travel di kiri butuh teks ringkas —
+     turun ~15% dari bio/sinyal agar tak berebut ruang. */
+  --step-about-bio-slim: clamp(1.05rem, 1.85vw, 1.5rem);
+  --step-about-signal-slim: clamp(0.8rem, 1.2vw, 1rem);
+
+  /* Layout */
+  --gutter: clamp(1.25rem, 5vw, 5rem);
+  --measure: 38rem;
+  --nav-h: 4.5rem;
+
+  /* Perisai keterbacaan teks di atas kanvas (bayangan netral, bukan glow) */
+  --text-shield: rgba(5, 7, 13, 0.85);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}

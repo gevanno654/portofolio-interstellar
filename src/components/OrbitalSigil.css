@@ -1,0 +1,27 @@
+/* ————————————————————————————————————————————————
+   OrbitalSigil (E) · fallback 2D HeroOrnament (D).
+   Dimensi sama dengan slot D agar swap tanpa layout shift.
+   ———————————————————————————————————————————————— */
+
+.orbital-sigil {
+  /* Dimensi identik dengan D agar swap tanpa layout shift. */
+  width: 90rem;
+  max-width: none;
+  min-width: 0;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+.orbital-sigil canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .orbital-sigil {
+    width: 100%;
+    justify-self: start;
+    max-width: 17rem;
+  }
+}

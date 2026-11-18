@@ -1,0 +1,109 @@
+.skills-head {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+  align-items: end;
+  margin-bottom: clamp(2.5rem, 6vh, 4rem);
+}
+
+.skills-head .display {
+  font-size: var(--step-h2);
+}
+
+/* Modul konsol: garis horizontal penuh, tanpa kartu */
+.sys-list {
+  border-top: 1px solid var(--line);
+}
+
+.sys {
+  border-bottom: 1px solid var(--line);
+  padding: clamp(1.6rem, 3.5vh, 2.4rem) 0;
+  display: grid;
+  grid-template-columns: minmax(14rem, 22rem) 1fr;
+  gap: 1.5rem 3rem;
+  transition: background 0.4s var(--ease-out);
+}
+
+.sys:hover {
+  background: linear-gradient(90deg, rgba(82, 108, 145, 0.08), transparent 60%);
+}
+
+.sys-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sys-index {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.3em;
+  color: var(--warm-starlight);
+}
+
+.sys-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--step-h3);
+  line-height: 1.15;
+}
+
+.sys-status {
+  margin-top: auto;
+  padding-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.28em;
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.sys-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--warm-starlight);
+  box-shadow: 0 0 10px var(--warm-starlight);
+}
+
+.sys-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0;
+  align-content: center;
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+  line-height: 2;
+}
+
+/* Readout teks dengan separator — bukan badge kapsul */
+.sys-item + .sys-item::before {
+  content: "/";
+  margin: 0 1.1rem;
+  color: var(--stellar-blue);
+  opacity: 0.6;
+}
+
+.sys-item-n {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  color: var(--ink-faint);
+  margin-right: 0.5rem;
+  vertical-align: super;
+}
+
+@media (max-width: 800px) {
+  .skills-head {
+    grid-template-columns: 1fr;
+  }
+
+  .sys {
+    grid-template-columns: 1fr;
+  }
+
+  .sys-status {
+    margin-top: 0;
+    padding-top: 0.4rem;
+  }
+}

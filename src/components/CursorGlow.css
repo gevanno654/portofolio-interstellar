@@ -1,0 +1,41 @@
+/* ————————————————————————————————————————————————
+   CursorGlow · kursor cahaya + trail (dekoratif global).
+   Tidak menangkap pointer; di bawah nav, di atas konten.
+   Mati total di touch & reduced-motion (komponen return null).
+   ———————————————————————————————————————————————— */
+
+.cursor-glow-root {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+/* Kanvas trail dihapus — sprinkle mouse dimatikan, hanya glow + geser bintang. */
+
+.cursor-glow {
+  position: absolute;
+  top: -90px;
+  left: -90px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(196, 164, 119, 0.14) 0%,
+    rgba(143, 163, 196, 0.08) 40%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  transition: scale 0.3s var(--ease-out);
+}
+
+.cursor-glow[data-hot="1"] {
+  scale: 1.6;
+}
+
+@media (hover: none) {
+  .cursor-glow-root {
+    display: none;
+  }
+}

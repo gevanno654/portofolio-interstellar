@@ -1,0 +1,80 @@
+.journey-head {
+  margin-bottom: clamp(3rem, 7vh, 5rem);
+  max-width: 60rem;
+}
+
+.journey-head .display {
+  font-size: var(--step-h2);
+  margin-bottom: 1.5rem;
+}
+
+/* Track menampung rel J; garis lurus lama digantikan flight-rail. */
+
+.journey-track {
+  position: relative;
+  padding-left: clamp(2rem, 6vw, 4.5rem);
+  display: grid;
+  gap: clamp(2.5rem, 6vh, 4rem);
+}
+
+.journey-entry {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(10rem, 16rem) 1fr;
+  gap: 1rem 3rem;
+}
+
+.journey-node {
+  position: absolute;
+  left: calc(-1 * clamp(2rem, 6vw, 4.5rem) + 3px);
+  top: 0.45rem;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--warm-starlight);
+  background: var(--deep-space);
+  transform: rotate(45deg);
+}
+
+.journey-period {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--nebula-white);
+}
+
+.journey-coord {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.24em;
+  color: var(--warm-starlight);
+  margin-top: 0.4rem;
+}
+
+.journey-what h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--step-h3);
+  line-height: 1.2;
+}
+
+.journey-org {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--stellar-blue);
+  margin: 0.5rem 0 0.8rem;
+}
+
+.journey-detail {
+  color: var(--ink-dim);
+  max-width: var(--measure);
+}
+
+@media (max-width: 700px) {
+  .journey-entry {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+}

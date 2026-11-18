@@ -1,0 +1,65 @@
+/* ————————————————————————————————
+   ProjectCard (H) · tilt 3D CSS compositor-only.
+   Scene memberi perspective; frame berputar maks 8° via rAF lerp.
+   2 lapis inner: thumb translateZ(28px), glow translateZ(48px).
+   Tanpa JS / RM / touch → kartu datar statis.
+   ———————————————————————————————— */
+
+.thumb-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: inherit;
+  color: inherit;
+}
+
+.thumb-btn:focus-visible {
+  outline: 2px solid var(--warm-starlight);
+  outline-offset: 4px;
+}
+
+.tilt-scene {
+  perspective: 900px;
+}
+
+.tilt-frame {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.tilt-frame[data-tilt="off"] {
+  transform: none !important;
+}
+
+/* Lapis depth — beda 20px. */
+.tilt-frame .thumb {
+  transform: translateZ(28px);
+}
+
+.tilt-frame .thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(196, 164, 119, 0.18), transparent 70%);
+  transform: translateZ(20px);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out);
+}
+
+.tilt-scene:hover .tilt-frame .thumb::after {
+  opacity: 1;
+}
+
+.tilt-frame .proj-meta {
+  transform: translateZ(12px);
+}
+
+@media (hover: none) {
+  .tilt-frame {
+    transform: none !important;
+  }
+}

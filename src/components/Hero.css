@@ -1,0 +1,352 @@
+/* Hallmark · redesign: polish · genre: atmospheric (inferred)
+ * Floor: 6 FAIL + 1 REFLEX + 1 WARN (sloplint --genre atmospheric, 2026-11-13)
+ * Theme: lungsuran proyek (Interstellar Parallax) — tanpa ganti sistem
+ * v2.0.0 */
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: calc(var(--nav-h) + 1rem) var(--gutter) clamp(2rem, 4vh, 2.75rem);
+  position: relative;
+  /* clip dua sumbu (bukan hidden): menampung bleed slot 90rem tanpa
+     menambah scroll, tanpa memicu scroll container (sticky/parallax aman). */
+  overflow: clip;
+}
+
+/* Komposisi: teks di zona KIRI-ATAS (di atas garis tengah), lubang
+   raksasa di kanan-bawah — tidak lagi bertumpuk di tengah. .hero-content
+   STATIC agar slot fixed global di .cosmos stabil di semua state pin. */
+.hero-content {
+  max-width: 88rem;
+  margin-inline: auto;
+  /* Layer GPU sendiri: gerak scrub +40% tak me-repaint teks/ornamen di
+     bawahnya — satu-satunya prasyarat compositing yang belum ada. */
+  will-change: transform;
+  /* Teks ke atas: konten di awal, udara besar di bawah untuk lubang. */
+  margin-block-start: clamp(1.5rem, 4vh, 3rem);
+  margin-block-end: auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(0.9rem, 2.2vh, 1.5rem);
+  align-items: start;
+  align-content: start;
+  position: static;
+}
+
+/* Semua anak grid boleh menyusut di bawah intrinsic width-nya. */
+.hero-content > * {
+  min-width: 0;
+}
+
+/* BUG 1+2: tanpa penempatan eksplisit, auto-placement meletakkan h1
+   di kolom kanan yang sempit (nama terpotong) dan ornament bertumpuk
+   di baris bawah (terpotong). Editorial selalu kolom 1; slot
+   ornament selalu kolom 2 merentang penuh tinggi editorial. */
+.hero-name,
+.hero-meta {
+  grid-column: 1;
+}
+
+/* Wadah jangkar global: FIXED di .cosmos (di luar pohon pin GSAP hero).
+   GSAP pin mengubah .hero jadi position:fixed saat scrub — slot absolute
+   di dalam hero ikut ter-fixed → jangkar bergeser vs prediksi shader.
+   Di .cosmos (fixed global, z-index -1 di belakang segalanya) posisi
+   identik di semua state pin. Ukuran 90vw raksasa bleed kanan,
+   pusat ~tengah-kanan — sesuai referensi. */
+.hero-slot-global {
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  margin: 0;
+  width: 90vw;
+  aspect-ratio: 1;
+  right: -22vw;
+  top: 52%;
+  transform: translateY(-50%);
+}
+
+.hero-slot-global .hero-ornament,
+.hero-slot-global .orbital-sigil {
+  /* Isi slot: mengisi penuh wadah global (ukuran dari wadah).
+     Slot raksasa sengaja bleed keluar kanan — dipotong overflow:clip. */
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  max-width: none;
+  pointer-events: none;
+}
+
+/* Teks di atas lubang (lubang paling belakang). */
+.hero-name,
+.hero-meta,
+.hero-scroll {
+  position: relative;
+  z-index: 1;
+}
+
+/* Perisai keterbacaan: teks di atas kanvas gelap selalu punya scrim.
+   Tanpa ini cincin terang menerobos di belakang huruf (screenshot). */
+.hero-name,
+.hero-meta,
+.hero-scroll-text {
+  text-shadow:
+    0 1px 10px var(--text-shield),
+    0 0 32px var(--text-shield);
+}
+
+.hero-name {
+  /* Display serif dua-baris: GEVANNO raksasa + YOH di bawahnya, kolom
+     kiri ≤45vw — lubang raksasa bleed kanan (~60vw+) tak menimpa teks. */
+  font-size: clamp(3.2rem, 8vw, 8rem);
+  text-transform: uppercase;
+  min-width: 0;
+  max-width: 45vw;
+  overflow-wrap: break-word;
+  line-height: 0.94;
+  letter-spacing: -0.015em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.hero-name .line {
+  display: block;
+  overflow: hidden;
+  /* Ruang masker untuk descender (y/g) agar tak terpotong. */
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.hero-name .line-inner {
+  display: block;
+  /* Nama tidak boleh melampaui kolom kiri. */
+  max-width: 100%;
+}
+
+/* Aksen nama: satu bobot satu warna (roman, tanpa italic parsial).
+   GEVANNO (.line-name-main) PUTIH SOLID — tidak tersentuh gradasi
+   (aturan penegas ada di bawah blok gradasi). */
+
+/* Kar per-karakter intro: inline-block agar yPercent per huruf bekerja;
+   spasi sudah jadi nbsp di Chars(). */
+.hero-name .char,
+.hero-role .char {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* GEVANNO: PUTIH SOLID — ditegaskan setelah aturan gradasi agar tak
+   tersentuh background-clip dari selektor mana pun. */
+.hero-name .line-name-main .char {
+  background: none;
+  color: var(--nebula-white);
+  -webkit-text-fill-color: var(--nebula-white);
+}
+
+/* Gradasi cincin per-huruf: YOH + sapaan + peran — terang-atas →
+   emas-bawah (cahaya cincin). Per .char (bukan per kata) agar gradasi
+   konsisten di tiap huruf dan tidak pecah saat intro yPercent per
+   karakter. Fallback: color solid bila background-clip tak didukung. */
+.hero-name .line-name-sub .char,
+.hero-name .line-hello .char,
+.hero-role .char {
+  background: linear-gradient(180deg, var(--grad-hero-light) 0%, var(--grad-hero-gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero-name .line-name-sub .char,
+  .hero-name .line-hello .char,
+  .hero-role .char {
+    color: var(--warm-starlight);
+  }
+}
+
+/* Baris sapaan: kecil + tracking lebar (peran eyebrow), bukan headline
+   kedua — menghindari dua baris raksasa bertumpuk (AI slop). */
+.hero-name .line-hello {
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 1.4vw, 1.2rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  color: var(--ink-dim);
+  text-transform: none;
+  padding-bottom: 0;
+  margin-bottom: 0.6em;
+}
+
+/* Baris kedua rata kiri di bawah baris utama (kolom kiri, bukan
+   indent kanan) — zona teks ≤55vw, lubang di kanan ≥60vw. */
+/* Baris utama proporsional penuh, baris pasangan lebih kecil. */
+.hero-name .line-name-sub .line-inner {
+  font-size: 0.62em;
+  letter-spacing: 0.01em;
+}
+
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  max-width: none;
+  justify-self: start;
+  margin-top: clamp(0.75rem, 2vh, 1.25rem);
+  min-width: 0;
+  width: 100%;
+}
+
+/* Aturan peran: garis tipis di KIRI teks (bukan border-top penuh) —
+   sejajar baseline, tak lagi terlihat seperti garis nyasar acak. */
+.hero-meta-rule {
+  display: block;
+  width: clamp(3.5rem, 9vw, 8rem);
+  height: 1px;
+  background: var(--line);
+  flex: none;
+}
+
+.hero-role {
+  font-family: var(--font-body);
+  font-size: 1.375rem;
+  letter-spacing: 0.01em;
+  color: var(--warm-starlight);
+  /* Mask per-karakter (sama seperti .hero-name .line): intro .char
+     naik dari baseline tanpa bocor ke baris lain. */
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.hero-role .line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.hero-role .line-inner {
+  display: block;
+}
+
+.hero-role .char {
+  display: inline-block;
+  will-change: transform;
+}
+
+.hero-role strong {
+  font-weight: 500;
+}
+
+/* Petunjuk scroll: sudut kiri-bawah viewport (fixed dalam hero),
+   di bawah teks — selalu terlihat saat load, bukan di dalam flow bawah. */
+.hero-scroll {
+  position: absolute;
+  left: var(--gutter);
+  bottom: clamp(1.75rem, 4vh, 2.5rem);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0;
+  margin-left: 0;
+  z-index: 1;
+}
+
+.hero-scroll-text {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  color: var(--ink-dim);
+}
+
+.hero-scroll-line {
+  width: clamp(3rem, 8vw, 6rem);
+  height: 1px;
+  background: var(--line);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fokus keyboard: cincin instan 3:1 di atas kanvas. */
+.hero-scroll:focus-visible {
+  outline: 2px solid var(--warm-starlight);
+  outline-offset: 4px;
+}
+
+.hero-scroll:active {
+  opacity: 0.7;
+}
+
+.hero-scroll-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--warm-starlight);
+  animation: descend 2.4s var(--ease-out) infinite;
+}
+
+/* Jeda loop saat hover/fokus + hormati reduced motion. */
+.hero-scroll:hover .hero-scroll-line::after,
+.hero-scroll:focus-visible .hero-scroll-line::after {
+  animation-play-state: paused;
+}
+
+@keyframes descend {
+  0% {
+    transform: translateX(-100%);
+  }
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-name .char {
+    will-change: auto;
+  }
+  .hero-scroll-line::after {
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Reset penempatan desktop: semua kembali auto-flow satu kolom. */
+  .hero-name,
+  .hero-meta {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  /* Mobile: slot global mengecil di atas (zona langit), di luar teks. */
+  .hero-slot-global {
+    width: 70vw;
+    right: 15vw;
+    top: 12svh;
+    transform: none;
+  }
+
+  .hero-meta {
+    justify-self: start;
+    margin-top: 0;
+  }
+
+  .hero-scroll {
+    display: none;
+  }
+}
+
+/* Mobile: black hole di atas (zona langit), teks di bawah */
+@media (max-width: 767px) {
+  .hero {
+    padding-top: 42svh;
+  }
+}

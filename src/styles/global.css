@@ -1,0 +1,164 @@
+/* ————————————————————————————————————————————————
+   Global base · typography, reset, utilities editorial
+   ———————————————————————————————————————————————— */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  scroll-behavior: auto;
+  overflow-x: clip;
+}
+
+body {
+  background: var(--deep-space);
+  color: var(--nebula-white);
+  font-family: var(--font-body);
+  font-size: var(--step-body);
+  line-height: 1.65;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--warm-starlight);
+  color: var(--deep-space);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ——— Cosmic canvas: satu layer fixed di belakang segalanya ——— */
+.cosmos {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.cosmos canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Fallback statis bila WebGL tidak tersedia (class di <html>) */
+.no-webgl .cosmos {
+  background:
+    radial-gradient(ellipse 90vmax 34vmax at 50% 118%, rgba(196, 164, 119, 0.16), transparent 60%),
+    radial-gradient(circle 26vmin at 50% 42%, #000 0 62%, rgba(196, 164, 119, 0.35) 68%, transparent 74%),
+    var(--deep-space);
+}
+
+/* ——— Struktur section editorial ——— */
+.section {
+  position: relative;
+  padding: clamp(6rem, 12vh, 10rem) var(--gutter);
+}
+
+.section-inner {
+  max-width: 88rem;
+  margin-inline: auto;
+}
+
+/* Label mono kecil di atas setiap section: "02 // TRANSMISSION" */
+.section-tag {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--warm-starlight);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: clamp(2rem, 5vh, 3.5rem);
+}
+
+.section-tag::after {
+  content: "";
+  height: 1px;
+  width: clamp(4rem, 12vw, 10rem);
+  background: var(--line);
+}
+
+/* Headline display */
+.display {
+  font-family: var(--font-display);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.display em {
+  font-style: italic;
+  color: var(--warm-starlight);
+}
+
+/* Lede — paragraf pembuka setiap section */
+.lede {
+  font-size: var(--step-lede);
+  line-height: 1.7;
+  color: var(--ink-dim);
+  max-width: var(--measure);
+}
+
+/* Keterbacaan di atas langit dinamis: tak terlihat di atas latar
+   gelap, menolong saat sisa cahaya disk melintas di belakang teks. */
+.lede,
+.proj-desc,
+.journey-detail,
+.sys-items {
+  text-shadow: 0 1px 18px rgba(5, 7, 13, 0.85);
+}
+
+/* Link garis bawah editorial */
+.u-link {
+  border-bottom: 1px solid var(--stellar-blue);
+  padding-bottom: 2px;
+  transition: border-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
+}
+
+.u-link:hover {
+  border-color: var(--warm-starlight);
+  color: var(--warm-starlight);
+}
+
+/* Status awal elemen reveal — GSAP yang menganimasikan ke visible.
+   Tanpa JS, konten tetap terlihat (progressive enhancement). */
+.js .reveal {
+  opacity: 0;
+}
+
+/* ——— Reduced motion: tanpa Smoother, scroll native instan ——— */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .js .reveal {
+    opacity: 1;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    transition-duration: 0.001s !important;
+  }
+}

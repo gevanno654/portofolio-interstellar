@@ -1,0 +1,25 @@
+/* ————————————————————————————————
+   HeroBlackHole · slot ornament kanan hero = jangkar lubang global.
+   BUKAN canvas: wadah transparan penanda posisi; BlackHoleScene
+   (Cosmos, canvas fixed global) me-render lubang TEPAT di sini.
+   ———————————————————————————————— */
+
+.hero-ornament.hero-blackhole {
+  /* Jangkar proporsional 38vw: disk muat penuh di kanan, sejajar teks.
+     Fixed rem DIHAPUS; scale ikut viewport agar rasio konsisten. */
+  width: 38vw;
+  max-width: none;
+  min-width: 240px;
+  aspect-ratio: 1;
+  overflow: visible;
+  /* Transparan: lubang global terlihat "di dalam" slot. */
+  background: transparent;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .hero-ornament.hero-blackhole {
+    width: 100%;
+    max-width: 17rem;
+  }
+}

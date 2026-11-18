@@ -1,0 +1,216 @@
+/* About: teks offset kanan dengan headline besar.
+   OVERLAP hero (margin -100svh): about menumpuk hero selama pin
+   1 viewport — dissolve menyatu, tanpa zona mati.
+   Mobile/RM: tanpa overlap (alir natural). */
+
+@media (min-width: 901px) {
+  .about {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    /* Tengah via margin otomatis: konten jepit tengah vertikal. */
+    justify-content: normal;
+    position: relative;
+    z-index: 1;
+    /* Margin menarik about tepat ke atas hero (rentang pin). */
+    margin-top: -100svh;
+    /* Snap SCROLL butuh kontainer snap di SCROLLER (Smoother memakai
+       transform, bukan scroll native): snapTo progress 1 di trigger
+       pin = jepit akhir (lihat About.tsx). CSS snap di sini DICABUT. */
+  }
+  .about-grid {
+    margin-block: auto;
+  }
+
+  /* About FLUSH (tanpa margin section-inner): panggung travel — lubang
+     40vw di kiri + teks kanan butuh bentang penuh 88rem tanpa inset
+     ganda (section padding + inner margin). Hanya about; section lain
+     tetap memakai .section-inner normal. */
+  .about-flush .section-inner {
+    max-width: none;
+    margin-inline: 0;
+    /* Rantai flex penuh: about (flex kolom) → inner (flex kolom, penuh)
+       → grid margin-auto = konten JEPIT TENGAH vertikal. Tanpa ini inner
+       block tinggi-ikut-konten (probe 405px), grid menempel atas. */
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .hero {
+    z-index: 0;
+  }
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  /* Tengah vertikal: kolom teks kanan + panggung lubang kiri sejajar
+     tengah section (bukan menempel atas). align start = grid 449px di
+     atas, kosong bawah 387px (probe DIAG). Kolom kiri kosong (Taurus
+     dicabut) tetap sebagai panggung lubang travel. */
+  align-items: center;
+  flex: 1;
+  margin-block: auto;
+}
+
+.about-text {
+  grid-column: 5 / 13;
+  text-align: right;
+}
+
+/* Rata kanan: blok teks ditempel ke tepi kanan kolom. */
+.about-headline,
+.about-sub,
+.about-signal {
+  margin-left: auto;
+}
+
+/* Quotes lama (border-aksen) DICABUT — diganti log sinyal. */
+.about-headline {
+  font-size: var(--step-h2);
+  max-width: 16ch;
+  margin-bottom: 1.6rem;
+  /* Satu baris: text-wrap balance (global .display) memecah "About Me."
+     jadi "About"/"Me." agar seimbang — baris kedua terpotong mask .line.
+     Headline pendek (9 char): paksa satu baris; muat hingga 390px. */
+  white-space: nowrap;
+}
+
+/* Mask per-baris (salin pola hero .line): intro .char naik dari
+   baseline tanpa bocor; ruang descender agar "b" tak terpotong. */
+.about-headline .line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.about-headline .line-inner {
+  display: block;
+}
+
+/* Gradasi cincin per-huruf PERSIS YOH (Hero.css): terang-atas →
+   emas-bawah, per .char agar tak pecah saat idle yPercent. */
+.about-headline .char {
+  display: inline-block;
+  will-change: transform;
+  background: linear-gradient(180deg, var(--grad-hero-light) 0%, var(--grad-hero-gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .about-headline .char {
+    color: var(--warm-starlight);
+  }
+}
+
+/* Subtitle kanan about: dibesarkan (lede→bio) agar mengisi halaman.
+   Selektor dua kelas: .lede (global) specificity sama tapi menang urutan
+   cascade → tanpa ini font-size tetap step-lede.
+   Putih penuh (bukan ink-dim): teks di atas langit gelap + kabut lubang
+   butuh kontras maksimal; text-shadow global tetap sebagai perisai. */
+.about-text .about-sub {
+  font-size: var(--step-about-bio);
+  max-width: 44ch;
+  color: #f4f6fb;
+}
+
+/* Ramping saat travel aktif (lubang menemani di kiri): bio/sinyal turun
+   ~15% agar tak berebut ruang; kembali penuh saat lubang pergi.
+   Kelas di-toggle Cosmos travel onUpdate (progress 0/1). */
+.about-text.slim .about-sub {
+  font-size: var(--step-about-bio-slim);
+}
+
+/* Mask per-kata (salin pola .line headline): rise .word dari baseline
+   tanpa bocor; ruang descender agar "y/g" tak terpotong. */
+.about-text .wmask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.about-text .word {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* Log sinyal (ganti quotes): mono kecil, tanpa tanda kutip — bahasa
+   sistem seperti nav/tag mono situs. Baris tag aksen terang.
+   Isi putih penuh (tag tetap aksen terang): kontras di atas langit gelap. */
+.about-signal {
+  margin: 1.6rem 0 0 auto;
+  max-width: 38ch;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: var(--step-about-signal);
+  letter-spacing: 0.08em;
+  line-height: 1.8;
+  color: #f4f6fb;
+}
+
+.about-signal-tag {
+  color: var(--warm-starlight);
+}
+
+.about-text.slim .about-signal {
+  font-size: var(--step-about-signal-slim);
+}
+
+.about-p + .about-p {
+  margin-top: 1.4rem;
+}
+
+.about-facts {
+  margin-top: 3rem;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.about-fact {
+  padding: 1.1rem 1.5rem 1.1rem 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.about-fact:nth-child(even) {
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--line-soft);
+}
+
+.about-fact dt {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--warm-starlight);
+  margin-bottom: 0.35rem;
+}
+
+.about-fact dd {
+  color: var(--ink-dim);
+}
+
+@media (max-width: 900px) {
+  .about-text {
+    grid-column: 1 / 13;
+  }
+}
+
+@media (max-width: 600px) {
+  .about-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .about-fact:nth-child(even) {
+    padding-left: 0;
+    border-left: 0;
+  }
+}

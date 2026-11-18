@@ -1,0 +1,76 @@
+.contact {
+  padding-bottom: clamp(3rem, 6vh, 5rem);
+  overflow: hidden;
+}
+
+.contact-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contact-inner .section-tag {
+  justify-content: center;
+}
+
+.contact-inner .section-tag::after {
+  display: none;
+}
+
+.contact-headline {
+  font-size: var(--step-h2);
+  max-width: 20ch;
+  margin-bottom: 1.5rem;
+}
+
+.contact-inner .lede {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.contact-email {
+  font-size: clamp(1.4rem, 4.5vw, 3.2rem);
+  border-bottom: 1px solid var(--stellar-blue);
+  padding-bottom: 0.4rem;
+  transition: color 0.35s var(--ease-out), border-color 0.35s var(--ease-out);
+  overflow-wrap: anywhere;
+}
+
+.contact-email:hover {
+  color: var(--warm-starlight);
+  border-color: var(--warm-starlight);
+}
+
+.contact-socials {
+  list-style: none;
+  padding: 0;
+  margin-top: 2.5rem;
+  display: flex;
+  gap: 2.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.contact-handle {
+  color: var(--ink-faint);
+}
+
+/* Distant horizon — satu garis cahaya di kejauhan */
+.horizon {
+  margin-top: clamp(4rem, 10vh, 7rem);
+  display: flex;
+  justify-content: center;
+}
+
+.horizon-line {
+  display: block;
+  width: min(60rem, 86vw);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--warm-starlight) 30%, var(--nebula-white) 50%, var(--warm-starlight) 70%, transparent);
+  box-shadow: 0 0 60px 8px rgba(196, 164, 119, 0.25), 0 -18px 80px 10px rgba(196, 164, 119, 0.08);
+}

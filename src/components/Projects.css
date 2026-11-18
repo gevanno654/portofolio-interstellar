@@ -1,0 +1,214 @@
+.projects-head {
+  margin-bottom: clamp(3rem, 8vh, 5.5rem);
+  max-width: 60rem;
+}
+
+.projects-head .display {
+  font-size: var(--step-h2);
+  margin-bottom: 1.5rem;
+}
+
+.proj {
+  margin-bottom: clamp(4rem, 10vh, 7rem);
+}
+
+.proj:last-child {
+  margin-bottom: 0;
+}
+
+/* ——— Pola A: bleed — full-bleed image, teks overlay kiri bawah ——— */
+.proj-bleed {
+  position: relative;
+}
+
+.proj-bleed .thumb {
+  min-height: clamp(22rem, 62vh, 38rem);
+}
+
+.proj-bleed .proj-meta {
+  position: absolute;
+  left: clamp(1rem, 4vw, 3rem);
+  bottom: clamp(1rem, 4vw, 3rem);
+  max-width: 30rem;
+  padding: 1.8rem;
+  background: rgba(5, 7, 13, 0.72);
+  backdrop-filter: blur(6px);
+  border-left: 2px solid var(--warm-starlight);
+}
+
+/* ——— Pola B: split 7:5 ——— */
+.proj-split {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+}
+
+.proj-split .thumb {
+  min-height: clamp(18rem, 48vh, 30rem);
+  order: 2;
+}
+
+/* ——— Pola C: index editorial ——— */
+.proj-index .index-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 1.5rem;
+  padding: 1.6rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  transition: padding 0.4s var(--ease-out), background 0.4s var(--ease-out);
+}
+
+.proj-index .index-row:hover {
+  padding-left: 1.2rem;
+  background: linear-gradient(90deg, rgba(196, 164, 119, 0.07), transparent 55%);
+}
+
+.index-n {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.3em;
+  color: var(--warm-starlight);
+}
+
+.index-title {
+  font-size: clamp(1.8rem, 4.5vw, 3.4rem);
+}
+
+.index-year {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.24em;
+  color: var(--ink-faint);
+}
+
+.index-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  padding-top: 1.4rem;
+  max-width: 54rem;
+}
+
+/* ——— Meta proyek bersama ——— */
+.proj-index {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--warm-starlight);
+  margin-bottom: 0.8rem;
+}
+
+.proj-title {
+  font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+  margin-bottom: 1rem;
+}
+
+.proj-bleed .proj-title {
+  font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+}
+
+.proj-desc {
+  color: var(--ink-dim);
+  max-width: var(--measure);
+  margin-bottom: 1.2rem;
+}
+
+.proj-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0;
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 1.2rem;
+}
+
+.proj-stack span + span::before {
+  content: "·";
+  margin: 0 0.8rem;
+  color: var(--stellar-blue);
+}
+
+.proj-links {
+  display: flex;
+  gap: 1.6rem;
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* ——— Thumbnail placeholder prosedural ———
+   Ganti <Thumb> dengan <img src=…> saat aset asli tersedia. */
+.thumb {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 20%, rgba(196, 164, 119, 0.14), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(82, 108, 145, 0.16), transparent 60%),
+    var(--cosmic-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumb-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+}
+
+.thumb-index {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(4rem, 10vw, 8rem);
+  color: var(--nebula-white);
+  opacity: 0.22;
+}
+
+.thumb-note {
+  position: absolute;
+  bottom: 1rem;
+  left: 1.2rem;
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--warm-starlight);
+  opacity: 0.8;
+}
+
+@media (max-width: 800px) {
+  .proj-split {
+    grid-template-columns: 1fr;
+  }
+
+  .proj-split .thumb {
+    order: -1;
+  }
+
+  .proj-bleed .proj-meta {
+    position: static;
+    border-left: 0;
+    border-top: 2px solid var(--warm-starlight);
+    background: transparent;
+    backdrop-filter: none;
+    padding: 1.4rem 0 0;
+    max-width: none;
+  }
+
+  .index-detail {
+    grid-template-columns: 1fr;
+  }
+}

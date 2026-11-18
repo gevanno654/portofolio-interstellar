@@ -1,0 +1,84 @@
+/* ————————————————————————————————
+   AboutTopography (F) · kontur topografi + konstelasi abstrak.
+   Kolom kiri About (1/4); teks tetap 4/13. Tanpa foto/figur.
+   ———————————————————————————————— */
+
+.about-visual {
+  grid-column: 1 / 4;
+  grid-row: 1;
+  align-self: start;
+  margin: 0;
+  position: sticky;
+  top: 6rem;
+}
+
+.topo-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* Garis rasi: digambar saat scroll (dashoffset 1→0 via GSAP). */
+.topo-link {
+  fill: none;
+  stroke: var(--stellar-blue);
+  stroke-opacity: 0.55;
+  stroke-width: 1;
+  stroke-dasharray: 1;
+}
+
+/* Reduced motion: rasi tampil jadi, tanpa animasi. */
+.topo-rm .topo-link {
+  opacity: 1;
+  stroke-dashoffset: 0;
+}
+
+.topo-star {
+  /* Warna default; di-override inline fill per bintang (rasi + latar). */
+  fill: var(--warm-starlight);
+  cursor: pointer;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.3s var(--ease-out, ease-out);
+  /* Kelip halus (delay per bintang via --tw): hidup tanpa gerak berlebih. */
+  animation: topo-twinkle 3.2s ease-in-out var(--tw, 0s) infinite;
+}
+
+/* Bintang latar: lebih kecil/redup agar rasi tetap fokus. */
+.topo-extra {
+  cursor: default;
+  opacity: 0.6;
+}
+
+@keyframes topo-twinkle {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Reduced motion: tanpa kelip. */
+.topo-rm .topo-star {
+  animation: none;
+}
+
+.topo-star:hover {
+  transform: scale(1.9);
+}
+
+/* Aldebaran: bintang paling terang (oranye sang Banteng). */
+.topo-star-bright {
+  filter: drop-shadow(0 0 5px rgba(240, 180, 106, 0.8));
+}
+
+/* Caption Taurus DIHAPUS dari JSX (desain) — aturan disisakan bila
+   dipakai lagi nanti. */
+
+@media (max-width: 900px) {
+  .about-visual {
+    grid-column: 1 / 13;
+    grid-row: auto;
+    position: static;
+    max-width: 22rem;
+  }
+}

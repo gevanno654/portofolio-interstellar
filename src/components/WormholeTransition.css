@@ -1,0 +1,152 @@
+/* ————————————————————————————————
+   WormholeTransition (I) · overlay full-viewport 2500ms.
+   GL quad bila GPU bebas; fallback statis bila gagal.
+   Tanpa elemen berputar. RM → cut, dikendalikan dari TS.
+   ———————————————————————————————— */
+
+.wormhole {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--deep-space);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.wormhole-canvas,
+.wormhole-fb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Fallback: GL disembunyikan, kanvas 2D yang bicara (animasi nyata). */
+.wormhole-css .wormhole-canvas {
+  display: none;
+}
+
+.wormhole-css {
+  background: var(--deep-space);
+}
+
+.wormhole-core {
+  position: relative;
+  text-align: center;
+  outline: none;
+  animation: worm-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes worm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(1.15);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.wormhole-eyebrow {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wormhole-core,
+  .wormhole-title,
+  .wormhole-pct-fill {
+    animation: none;
+  }
+  .wormhole-pct-fill {
+    transform: scaleX(1);
+  }
+}
+
+.wormhole-title {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  color: var(--nebula-white);
+  margin: 0 0 1rem;
+  animation: worm-title-in 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* (kelas lama .wormhole-eyebrow/.wormhole-dest dihapus dari markup;
+   sisa rule display:none di bawah untuk jaga-jaga bila di-cache.) */
+
+@keyframes worm-title-in {
+  0% {
+    opacity: 0;
+    transform: scaleY(2.2) scaleX(0.85);
+    filter: blur(10px);
+  }
+  55% {
+    opacity: 1;
+    transform: scaleY(0.94) scaleX(1.02);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Progress bar tipis: penuh tepat saat navigasi (hisap 2500ms). */
+.wormhole-pct {
+  width: min(240px, 50vw);
+  height: 2px;
+  margin: 0 auto 1.1rem;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.wormhole-pct-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--warm-starlight);
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: worm-pct 2.5s linear forwards;
+}
+
+@keyframes worm-pct {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wormhole-core,
+  .wormhole-title,
+  .wormhole-pct-fill {
+    animation: none;
+  }
+  .wormhole-pct-fill {
+    transform: scaleX(1);
+  }
+}
+
+.wormhole-abort {
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+}
+
+.wormhole-abort:hover,
+.wormhole-abort:focus-visible {
+  color: var(--nebula-white);
+  border-color: var(--warm-starlight);
+}

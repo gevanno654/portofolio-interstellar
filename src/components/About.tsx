@@ -167,7 +167,10 @@ export default function About() {
     let exitTimer: number | undefined;
     const tryExit = () => {
       if (exitPlayed || !exitArmed) return;
-      if ((window.scrollY || 0) >= 1200) {
+      // Ambang 1100 (maju dari 1200): transisi mulai sedikit lebih awal —
+      // scroll untuk exit lebih pendek, teks masih penuh di frame (probe
+      // headBox +48 di Y1100) sehingga koreografi terbaca.
+      if ((window.scrollY || 0) >= 1100) {
         exitPlayed = true;
         roll.pause();
         wordDrop.pause();

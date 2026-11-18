@@ -144,9 +144,11 @@
 
 /* Log sinyal (ganti quotes): mono kecil, tanpa tanda kutip — bahasa
    sistem seperti nav/tag mono situs. Baris tag aksen terang.
-   Isi putih penuh (tag tetap aksen terang): kontras di atas langit gelap. */
+   Isi putih penuh (tag tetap aksen terang): kontras di atas langit gelap.
+   Padding bawah dipotong (0.5rem): jarak ke section berikut ramping —
+   scroll exit lebih pendek, quotes tak menggantung jauh di atas skills. */
 .about-signal {
-  margin: 1.6rem 0 0 auto;
+  margin: 1.6rem 0 0.5rem auto;
   max-width: 38ch;
   text-align: right;
   font-family: var(--font-mono);

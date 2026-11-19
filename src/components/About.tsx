@@ -127,9 +127,11 @@ export default function About() {
     // tween duration SAMA → lenyap berbarengan, durasi identik. Pola hero:
     // scrub 0.6, ease none, fromTo + immediateRender:false. Bendera
     // __aboutExitActive = pemilik hole: Cosmos skip paksa-1 bila aktif
-    // (aturan satu penulis per posisi scroll). progress 0/1 = bendera
-    // mati (hero/awal + luar rentang = Cosmos pemilik lagi). Reversibel
-    // penuh: scrub membalik sendiri, balik = teks + lubang kembali.
+    // (aturan satu penulis per posisi scroll). LATCH histeresis (fix kedip
+    // 2026-11-19): MATI hanya saat progress kembali ≤ 0.02 — BUKAN di batas
+    // 1. Tanpa ini, ayunan scrub 0.99↔1.00 di tepi rentang membuat penulis
+    // flip 0/1 per tick = kedip seluruh lubang. Ujung (≥1): About TETAP
+    // pemilik + tulis 0. Reversibel penuh: scrub membalik sendiri.
     const exitState = { hole: 1 };
     const applyHole = () => {
       try {
@@ -147,15 +149,15 @@ export default function About() {
           end: "+=300",
           scrub: 0.6,
           onUpdate: (self) => {
-            const active = self.progress > 0 && self.progress < 1;
-            (window as unknown as { __aboutExitActive?: boolean }).__aboutExitActive = active;
-            if (active) {
-              applyHole();
-            } else if (self.progress >= 1) {
-              exitState.hole = 0;
+            const w = window as unknown as { __aboutExitActive?: boolean };
+            if (self.progress <= 0.02) {
+              // Kembali ke awal: lepas kepemilikan (Cosmos pemilik lagi).
+              w.__aboutExitActive = false;
+              exitState.hole = 1;
               applyHole();
             } else {
-              exitState.hole = 1;
+              // Di dalam rentang ATAU lewat ujung: About pemilik, latch.
+              w.__aboutExitActive = true;
               applyHole();
             }
           },

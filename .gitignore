@@ -26,3 +26,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Worktree lokal (SDD) — JANGAN commit
+.worktrees/

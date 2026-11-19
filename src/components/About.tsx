@@ -166,7 +166,7 @@ export default function About() {
         // onUpdate di TWEEN (bukan trigger): kirim nilai SETELAH tween tulis
         // — urutan trigger.onUpdate vs tween tick tak dijamin, kirim dari
         // sini selalu baca hole terbaru. Reversibel ikut scrub.
-        .fromTo(exitState, { hole: 1 }, { hole: 0, ease: "none", duration: 1, onUpdate: applyHole }, 0);
+        .fromTo(exitState, { hole: 1 }, { hole: 0, ease: "none", duration: 1, immediateRender: false, onUpdate: applyHole }, 0);
     }
     // GATE ENTRANCE: hero lenyap (heroOp ≤ 0.05) DAN posisi about sudah
     // dekat tengah: rect top #about ≤ 40% viewport. BUKAN scroll absolut
@@ -311,7 +311,15 @@ export default function About() {
     };
     document.addEventListener("click", onNavAbout);
     // Cleanup (dilepas SETELAH ctx.revert oleh useGsapScope).
+    // Bendera pemilik hole WAJIB mati di sini (fix RF2/I1): rebuild
+    // desktop→mobile/RM di tengah exit meninggalkan flag true → Cosmos
+    // skip paksa-1 selamanya + hole beku faded. Cleanup = Cosmos pemilik
+    // lagi, hole penuh.
     return () => {
+      (window as unknown as { __aboutExitActive?: boolean }).__aboutExitActive = false;
+      try {
+        (window as unknown as { __sceneHandle?: { setHoleVis: (v: number) => void } }).__sceneHandle?.setHoleVis(1);
+      } catch { /* abaikan */ }
       document.removeEventListener("click", onNavAbout);
       window.clearInterval(poll);
       roll.kill();

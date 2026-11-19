@@ -1,3 +1,10 @@
+/* Jarak napas pasca-exit About (2026-11-19): exit scrub about berakhir
+   tepat saat skills masuk — tanpa ruang ini judul skills menempel sisa
+   about. Tambahan di atas padding section global; hanya #skills. */
+#skills {
+  padding-top: clamp(3rem, 7vh, 5rem);
+}
+
 .skills-head {
   display: grid;
   grid-template-columns: 1.2fr 1fr;

@@ -18,6 +18,37 @@
   font-size: var(--step-h2);
 }
 
+/* Judul sticky (2026-11-20): tengah horizontal, diam selama scroll dalam
+   section, hilang natural saat ganti section (sticky murni, tanpa JS).
+   Di luar area pin + z-index di atas blok agar tak ikut zoom / tertutup
+   batu. Teks solid (bukan transparan) agar terbaca di atas canvas. */
+.doing-title-sticky {
+  position: sticky;
+  top: calc(var(--nav-h) + 1rem);
+  z-index: 5;
+  text-align: center;
+  pointer-events: none;
+  font-size: var(--step-h2);
+  margin: 0 0 clamp(2rem, 5vh, 3.5rem);
+}
+
+/* Mask split-char (pola .line Hero): intro .char naik dari mask. */
+.doing-title-sticky .line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.doing-title-sticky .line-inner {
+  display: block;
+}
+
+.doing-title-sticky .char {
+  display: inline-block;
+  will-change: transform;
+}
+
 .doing-list {
   display: flex;
   flex-direction: column;

@@ -5,11 +5,25 @@ import { whatIDo } from "../content";
 import SkillRock from "./SkillRock";
 import "./Skills.css";
 
-/* What I Do: 3 blok alternating (Develop batu 3D kiri/teks kanan;
+/* What I Do: judul sticky + 3 blok (Develop batu 3D kiri/teks kanan;
    Design cermin; Broadcast kiri/teks kanan).
    Masuk: grow 0.3→1 per blok. Exit blok 1–2: zoom 1→1.35 + fade, scrub
    reversibel (pola exit About: scrub 0.6 / ease none / fromTo +
    immediateRender:false). RM → statis penuh, tanpa trigger. */
+
+/* Pecah teks jadi span per karakter (pola Chars Hero: visual saja,
+   aria disembunyikan, label utuh tetap di aria-label h2). */
+function SplitChars({ text }: { text: string }) {
+  return (
+    <>
+      {text.split("").map((c, i) => (
+        <span key={i} className="char" aria-hidden="true">
+          {c === " " ? " " : c}
+        </span>
+      ))}
+    </>
+  );
+}
 
 export default function Skills() {
   const reduced = useReducedMotion();
@@ -17,6 +31,15 @@ export default function Skills() {
   const ref = useGsapScope<HTMLElement>(
     (_ctx, scope) => {
       if (reduced || !scope) return;
+      // Masuk judul: split-char naik dari mask (pola intro Hero:
+      // yPercent 115, stagger 0.035, sekali via once:true).
+      gsap.from(".doing-title-sticky .char", {
+        yPercent: 115,
+        duration: 0.9,
+        stagger: 0.035,
+        ease: "power3.out",
+        scrollTrigger: { trigger: scope.querySelector("#skills") ?? scope, start: "top 75%", once: true },
+      });
       const blocks = Array.from(scope.querySelectorAll<HTMLElement>(".doing-block"));
       blocks.forEach((block, i) => {
         const visual = block.querySelector(".doing-visual");
@@ -77,17 +100,13 @@ export default function Skills() {
   return (
     <section ref={ref} className="section skills" id="skills" aria-label="What I do">
       <div className="section-inner">
-        <p className="section-tag">02 // Capabilities</p>
-
-        <div className="skills-head">
-          <h2 className="display">
-            What I <em>Do</em>
-          </h2>
-          <p className="lede">
-            Three disciplines, one orbit — each with its own instrument. Scroll on: the current
-            instrument grows out of view as the next one takes its place.
-          </p>
-        </div>
+        <h2 className="doing-title-sticky display" aria-label="What I Do">
+          <span className="line">
+            <span className="line-inner">
+              <SplitChars text="What I Do" />
+            </span>
+          </span>
+        </h2>
 
         <div className="doing-list">
           {whatIDo.map((item, i) => (

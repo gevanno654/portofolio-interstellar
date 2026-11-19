@@ -314,14 +314,11 @@ export default function About() {
         resetEntrance();
       }
     }, 150);
-    // ANCHOR REPLAY: klik nav #about = entrance replay bersih (reset paksa
-    // SEBELUM smoother melompat ke ujung pin).
-    const onNavAbout = (e: MouseEvent) => {
-      const el = (e.target as HTMLElement | null)?.closest?.('a[href="#about"]');
-      if (!(el instanceof HTMLAnchorElement)) return;
-      resetEntrance();
-    };
-    document.addEventListener("click", onNavAbout);
+    // NAV #about: JANGAN reset paksa (revisi 2026-11-19) — klik nav saat
+    // teks sudah di tengah me-replay entrance dari nol (opacity 0 → jatuh
+    // ulang). Satu-satunya penulis entrance = POSISI halaman (polling
+    // tryFire + scrub balik-sendiri): dari bawah pun teks kembali via
+    // scrub, tanpa reset. Reset hanya jalur balik-hero (Y≤36 di atas).
     // Cleanup (dilepas SETELAH ctx.revert oleh useGsapScope).
     // Bendera pemilik hole WAJIB mati di sini (fix RF2/I1): rebuild
     // desktop→mobile/RM di tengah exit meninggalkan flag true → Cosmos
@@ -332,7 +329,6 @@ export default function About() {
       try {
         (window as unknown as { __sceneHandle?: { setHoleVis: (v: number) => void } }).__sceneHandle?.setHoleVis(1);
       } catch { /* abaikan */ }
-      document.removeEventListener("click", onNavAbout);
       window.clearInterval(poll);
       roll.kill();
       intro.kill();

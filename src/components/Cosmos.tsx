@@ -42,9 +42,14 @@ export default function Cosmos() {
 
       // Warp: lubang menyusut cepat di awal perjalanan, lalu melambat.
       // Konten section terbebas dari disk terang sesegera mungkin.
+      // ERA EXIT (2026-11-19): About exit = PEMILIK hole di rentangnya —
+      // skip paksa-1 bila bendera aktif (aturan: satu penulis per posisi
+      // scroll; pemaksa tiap tick = exit tak pernah terlihat).
       const update = (progress: number) => {
         handle.setScroll(1 - Math.pow(1 - progress, 2.2));
-        handle.setHoleVis(1);
+        if ((window as unknown as { __aboutExitActive?: boolean }).__aboutExitActive !== true) {
+          handle.setHoleVis(1);
+        }
       };
       // Elemen C: velocity dari turunan scroll (px/s, + = turun),
       // diteruskan ke debu kosmik; decay eksponensial di dalam RAF.

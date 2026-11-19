@@ -19,6 +19,8 @@ export type SceneHandle = {
   setVelocity: (v: number) => void;
   /** Cermin kemiringan disk 0 (hero +15°) → 1 (about −15°). */
   setMirror: (v: number) => void;
+  /** Bacaan aktual visibilitas lubang (0..1, untuk probe/diagnostik). */
+  getHoleVis: () => number;
   /** true = transisi wormhole (I) aktif → debu berhenti. */
   wormholeActive: boolean;
   dispose: () => void;
@@ -52,7 +54,7 @@ export function createScene(container: HTMLElement): SceneHandle {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
   } catch {
     document.documentElement.classList.add("no-webgl");
-    return { setScroll: () => {}, setHoleVis: () => {}, setVelocity: () => {}, setMirror: () => {}, wormholeActive: false, dispose: () => {}, ok: false };
+    return { setScroll: () => {}, setHoleVis: () => {}, setVelocity: () => {}, setMirror: () => {}, getHoleVis: () => 1, wormholeActive: false, dispose: () => {}, ok: false };
   }
 
   const mobile = isMobileWidth();
@@ -356,6 +358,7 @@ export function createScene(container: HTMLElement): SceneHandle {
     setMirror: (v: number) => {
       mirrorTarget = Math.min(1, Math.max(0, v));
     },
+    getHoleVis: () => visCurrent,
     get wormholeActive() {
       return wormholeActive;
     },

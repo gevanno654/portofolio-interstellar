@@ -29,3 +29,7 @@ dist-ssr
 
 # Worktree lokal (SDD) — JANGAN commit
 .worktrees/
+
+.worktrees/
+
+.sdd-what-i-do/

@@ -50,6 +50,38 @@ export const about = {
   ],
 };
 
+export type WhatIDoItem = {
+  id: string;
+  index: "01" | "02" | "03";
+  title: string;
+  lede: string;
+  items: string[];
+};
+
+export const whatIDo: WhatIDoItem[] = [
+  {
+    id: "develop",
+    index: "01",
+    title: "Develop",
+    lede: "I build interfaces that feel like places — cinematic, spatial, and precise.",
+    items: ["React", "Vite", "GSAP", "Three.js", "TODO — tambah/hapus"],
+  },
+  {
+    id: "design",
+    index: "02",
+    title: "Design",
+    lede: "TODO — satu kalimat pendekatan desain: layout, tipografi, motion.",
+    items: ["TODO — mis. Figma", "TODO — mis. Design system"],
+  },
+  {
+    id: "broadcast",
+    index: "03",
+    title: "Operator Broadcast",
+    lede: "TODO — satu kalimat pengalaman operator broadcast / live production.",
+    items: ["TODO — mis. OBS", "TODO — mis. Live switching"],
+  },
+];
+
 export const skillGroups = [
   {
     id: "languages",

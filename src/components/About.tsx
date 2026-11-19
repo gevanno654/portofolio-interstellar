@@ -123,17 +123,13 @@ export default function About() {
       ease: "power2.out",
       paused: true,
     });
-    // EXIT SCRUB ala hero-content (disetujui 2026-11-18, pendekatan A):
-    // time-based once (timer 3dtk + latch + ambang Y1100) DICABUT TOTAL —
-    // keluhan: 1x scroll dari tengah = tak ada gerakan sama sekali (syarat
-    // ganda timer+ambang belum terpenuhi). Ganti timeline scrub desktop:
-    // trigger #about (start = tengah konten hasil anchor revisi — Y704 di
-    // H900, end +=300 = satu ketukan roda), scrub 0.6, ease none — pola
-    // PERSIS hero (scrub 0.6, ease none).
-    // Level KONTAINER (.about-text: yPercent −15 + opacity 1→0) — bukan
-    // per-huruf/kata (scrub + time-based di properti sama = berebut/tick).
-    // Lubang ikut progress scrub (1→0.15) via onUpdate — reversibel penuh.
-    // Scroll balik = teks kembali (tanpa latch). Mobile/RM: alir natural.
+    // EXIT SCRUB (revisi 2026-11-19): SATU timeline, teks + hole dalam
+    // tween duration SAMA → lenyap berbarengan, durasi identik. Pola hero:
+    // scrub 0.6, ease none, fromTo + immediateRender:false. Bendera
+    // __aboutExitActive = pemilik hole: Cosmos skip paksa-1 bila aktif
+    // (aturan satu penulis per posisi scroll). progress 0/1 = bendera
+    // mati (hero/awal + luar rentang = Cosmos pemilik lagi). Reversibel
+    // penuh: scrub membalik sendiri, balik = teks + lubang kembali.
     const exitState = { hole: 1 };
     const applyHole = () => {
       try {
@@ -151,17 +147,26 @@ export default function About() {
           end: "+=300",
           scrub: 0.6,
           onUpdate: (self) => {
-            exitState.hole = 1 - self.progress * 0.85;
-            applyHole();
+            const active = self.progress > 0 && self.progress < 1;
+            (window as unknown as { __aboutExitActive?: boolean }).__aboutExitActive = active;
+            if (active) {
+              applyHole();
+            } else if (self.progress >= 1) {
+              exitState.hole = 0;
+              applyHole();
+            } else {
+              exitState.hole = 1;
+              applyHole();
+            }
           },
         },
       });
-      // fromTo + immediateRender:false (pola hero .hero-scroll): di progress
-      // 0 opacity 1 / yPercent 0 — tak menyentuh state entrance (intro anak
-      // masih jalan saat trigger dibuat). Entrance (fade+jatuh) milik
-      // tryFire/wordDrop; timeline ini HANYA untuk exit.
       exitTl
-        .fromTo(".about-text", { yPercent: 0, opacity: 1 }, { yPercent: -15, opacity: 0, ease: "none", duration: 1, immediateRender: false });
+        .fromTo(".about-text", { yPercent: 0, opacity: 1 }, { yPercent: -15, opacity: 0, ease: "none", duration: 1, immediateRender: false })
+        // onUpdate di TWEEN (bukan trigger): kirim nilai SETELAH tween tulis
+        // — urutan trigger.onUpdate vs tween tick tak dijamin, kirim dari
+        // sini selalu baca hole terbaru. Reversibel ikut scrub.
+        .fromTo(exitState, { hole: 1 }, { hole: 0, ease: "none", duration: 1, onUpdate: applyHole }, 0);
     }
     // GATE ENTRANCE: hero lenyap (heroOp ≤ 0.05) DAN posisi about sudah
     // dekat tengah: rect top #about ≤ 40% viewport. BUKAN scroll absolut
@@ -228,7 +233,9 @@ export default function About() {
       wordDrop.pause(0);
       roll.pause(0);
       // Scrub exit membalik sendiri (progress → 0 = teks kembali):
-      // reset di sini hanya state entrance + lubang penuh.
+      // reset di sini hanya state entrance + lubang penuh + bendera mati
+      // (kembali ke hero = Cosmos pemilik hole lagi).
+      (window as unknown as { __aboutExitActive?: boolean }).__aboutExitActive = false;
       exitState.hole = 1;
       applyHole();
       try {

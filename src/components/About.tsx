@@ -145,7 +145,17 @@ export default function About() {
         ease: "none",
         scrollTrigger: {
           trigger: "#about",
-          start: "top top",
+          // Start = titik pendaratan anchor (revisi 2026-11-19): exit mulai
+          // SEJAK tengah (bukan nunggu "top top" = 1 ketukan kemudian) —
+          // total 300px ≈ 3 ketukan roda sampai hilang. Fungsi kembalikan
+          // NUMBER absolut (posisi dokumen; didukung ScrollTrigger): secTop
+          // − koreksi tengah (vh−secH)/2. end "+=300" mengikuti start ini.
+          start: () => {
+            const el = document.getElementById("about");
+            if (!el) return "top top";
+            const secTop = el.getBoundingClientRect().top + window.scrollY;
+            return secTop - (window.innerHeight - el.offsetHeight) / 2;
+          },
           end: "+=300",
           scrub: 0.6,
           onUpdate: (self) => {

@@ -5,7 +5,12 @@
 
 @media (min-width: 901px) {
   .about {
-    min-height: 100svh;
+    /* Ramping (2026-11-18): min-height 100svh DICABUT — peninggalan era pin
+       1 viewport; konten cuma ~400px, 900px = 500px ruang kosong setelah
+       teks keluar + replay "kembali ke 1" terjadi di luar viewport.
+       auto = section ikut tinggi konten, jarak ke skills ramping.
+       Overlap (margin -100svh) tetap: dissolve hero→about menyatu. */
+    min-height: auto;
     display: flex;
     flex-direction: column;
     /* Tengah via margin otomatis: konten jepit tengah vertikal. */
@@ -26,6 +31,13 @@
      40vw di kiri + teks kanan butuh bentang penuh 88rem tanpa inset
      ganda (section padding + inner margin). Hanya about; section lain
      tetap memakai .section-inner normal. */
+  /* Padding ramping khusus about (2026-11-18): global .section 108px
+     atas-bawah = 216px ruang kosong (konten cuma 457px → 673px).
+     3rem cukup: dissolve tetap lega, jarak ke skills ramping. */
+  .about.section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
   .about-flush .section-inner {
     max-width: none;
     margin-inline: 0;

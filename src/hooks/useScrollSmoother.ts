@@ -50,14 +50,15 @@ export function useScrollSmoother(enabled: boolean): void {
       const target = document.querySelector(id);
       if (!target) return;
       e.preventDefault();
-      // KHUSUS #about: scroll ke UJUNG pin = 1 viewport aktual
-      // (window.innerHeight), BUKAN angka mati. (Probe: pin hero
-      // "+=100%" = tepat 1 viewport — di H900 ujungnya Y900 = tengah
-      // sempurna centerOff=0; angka mati 900 di H700/H1080 meleset.
-      // innerHeight = ujung pin di SEMUA layar = blok tengah + teks
-      // jatuh penuh.) Section lain tetap ke elemen (offset nav standar).
+      // KHUSUS #about: scroll ke TENGAH KONTEN (2026-11-18, revisi dari
+      // ujung-pin): section ramping (553px < viewport) — ujung pin Y900
+      // menempelkan konten ke ATAS viewport (offset -196px). Tengah konten
+      // = Y704 di H900 (probe txtC=0). Rumus jujur semua layar: ujung pin
+      // (innerHeight) − setengah selisih (viewport − tinggi section).
       if (id === "#about") {
-        smoother.scrollTo(window.innerHeight, true);
+        const sec = target as HTMLElement;
+        const y = window.innerHeight - Math.max(0, (window.innerHeight - sec.offsetHeight) / 2);
+        smoother.scrollTo(y, true);
       } else {
         smoother.scrollTo(target as HTMLElement, true, "top top+=64px");
       }

@@ -101,12 +101,18 @@ export default function Cosmos() {
         top: "50%",
         ease: "none",
         scrollTrigger: {
-          // Rentang PIN hero (posisi absolut 0→900, selaras exit +=100%):
-          // pin-spacer menggeser titik elemen (posisi elemen bergeser,
-          // absolut tidak).
+          // Rentang travel = 0 → Y-anchor about (revisi 2026-11-19): anchor
+          // mendarat di TENGAH konten ((vh+secH)/2, mis. 727 di H900) —
+          // dengan end 900 lama, travel baru 81% saat mendarat → lubang
+          // masih bergeser saat scroll bawah. end fungsional = travel
+          // SELESAI tepat saat mendarat (progress 1, pojok kiri); scroll
+          // bawah = slot DIAM (exit hanya fade). Scroll balik = mundur.
           trigger: document.querySelector(".hero") ?? "#about",
           start: 0,
-          end: 900,
+          end: () => {
+            const secH = document.getElementById("about")?.offsetHeight || window.innerHeight;
+            return (window.innerHeight + secH) / 2;
+          },
           scrub: 0.6,
           // Progress travel = satu sumber tiga efek (slot + mirror + slim):
           // handle scene diambil dari window (diisi async BlackHoleScene).

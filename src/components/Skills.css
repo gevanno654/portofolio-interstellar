@@ -18,18 +18,23 @@
   font-size: var(--step-h2);
 }
 
-/* Judul sticky (2026-11-20): tengah horizontal, diam selama scroll dalam
-   section, hilang natural saat ganti section (sticky murni, tanpa JS).
-   Di luar area pin + z-index di atas blok agar tak ikut zoom / tertutup
-   batu. Teks solid (bukan transparan) agar terbaca di atas canvas. */
+/* Judul dalam pin (2026-11-20, ruling C): absolute sebagai lapisan atas
+   .doing-pinned — ikut menempel selama pin (pin hanya translate
+   container), hilang natural saat unpin. fixed/sticky patah di dalam
+   konten Smoother (ancestor ter-transform); absolute-dalam-pin kebal.
+   Di luar tween zoom (zoom hanya menulis visual/copy) + z-index di atas
+   agar tak tertutup batu. */
 .doing-title-sticky {
-  position: sticky;
-  top: calc(var(--nav-h) + 1rem);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 5;
   text-align: center;
   pointer-events: none;
   font-size: var(--step-h2);
-  margin: 0 0 clamp(2rem, 5vh, 3.5rem);
+  margin: 0;
+  padding-top: calc(var(--nav-h) + 6rem);
 }
 
 /* Mask split-char (pola .line Hero): intro .char naik dari mask. */
@@ -53,6 +58,72 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Zona pin parallax (2026-11-20): develop + design BERTUMPUK dalam satu
+   viewport 100svh yang di-pin +=200%. Crossfade terjadi di tempat via
+   timeline (bukan via scroll internal). */
+.doing-pinned {
+  position: relative;
+  height: 100svh;
+  overflow: clip;
+}
+
+/* State awal anti-flash pre-JS (2026-11-20): develop kecil-hilang,
+   design tersembunyi — tween pin yang menganimasikan ke visible. */
+.doing-pinned .doing-block[data-item="develop"] .doing-visual {
+  opacity: 0;
+}
+
+.doing-pinned .doing-block[data-item="design"] .doing-visual,
+.doing-pinned .doing-block[data-item="design"] .doing-copy {
+  opacity: 0;
+}
+
+/* RM/mobile: tanpa JS menulis opacity — paksa semua visible. */
+@media (prefers-reduced-motion: reduce) {
+  .doing-pinned {
+    height: auto;
+    overflow: visible;
+  }
+  .doing-pinned .doing-block {
+    position: relative;
+    min-height: 92vh;
+  }
+  .doing-pinned .doing-block[data-item="develop"] .doing-visual,
+  .doing-pinned .doing-block[data-item="design"] .doing-visual,
+  .doing-pinned .doing-block[data-item="design"] .doing-copy {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 800px) {
+  .doing-pinned {
+    height: auto;
+    overflow: visible;
+  }
+  .doing-pinned .doing-block {
+    position: relative;
+    min-height: 0;
+  }
+  .doing-pinned .doing-block[data-item="develop"] .doing-visual,
+  .doing-pinned .doing-block[data-item="design"] .doing-visual,
+  .doing-pinned .doing-block[data-item="design"] .doing-copy {
+    opacity: 1;
+  }
+}
+
+.doing-pinned .doing-block {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  /* Blok setinggi viewport pin: konten rata tengah vertikal (tanpa ini
+     grid rata atas + konten pendek = kekosongan di bawah judul). */
+  align-content: center;
+}
+
+/* RM/mobile: tanpa pin — blok kembali ke flow normal bertumpuk hilang,
+   masing-masing setinggi viewport. Tanpa ini blok absolute saling
+   menutupi permanen. */
 
 .doing-block {
   display: grid;

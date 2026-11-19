@@ -96,22 +96,6 @@
   }
 }
 
-@media (max-width: 800px) {
-  .doing-pinned {
-    height: auto;
-    overflow: visible;
-  }
-  .doing-pinned .doing-block {
-    position: relative;
-    min-height: 0;
-  }
-  .doing-pinned .doing-block[data-item="develop"] .doing-visual,
-  .doing-pinned .doing-block[data-item="design"] .doing-visual,
-  .doing-pinned .doing-block[data-item="design"] .doing-copy {
-    opacity: 1;
-  }
-}
-
 .doing-pinned .doing-block {
   position: absolute;
   inset: 0;
@@ -225,6 +209,35 @@
 @media (max-width: 800px) {
   .skills-head {
     grid-template-columns: 1fr;
+  }
+
+  /* Mobile tanpa pin: blok kembali ke flow normal (batalkan absolute +
+     stack Task 2). Visual di atas, copy di bawah — mengikuti pola
+     alternating desktop yang dilipat satu kolom. */
+  .doing-pinned {
+    height: auto;
+    overflow: visible;
+  }
+
+  .doing-pinned .doing-block {
+    position: relative;
+    min-height: 0;
+    align-content: start;
+  }
+
+  /* Mobile: judul kembali ke flow normal di atas blok (tanpa ini
+     absolute menumpuk canvas batu). */
+  .doing-pinned .doing-title-sticky {
+    position: relative;
+    padding-top: 0;
+  }
+
+  /* Mobile tanpa JS menulis pin: paksa semua konten visible (tanpa ini
+     opacity:0 state awal bertahan permanen di non-desktop). */
+  .doing-pinned .doing-block[data-item="develop"] .doing-visual,
+  .doing-pinned .doing-block[data-item="design"] .doing-visual,
+  .doing-pinned .doing-block[data-item="design"] .doing-copy {
+    opacity: 1;
   }
 
   .doing-block,

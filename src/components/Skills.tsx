@@ -63,7 +63,12 @@ export default function Skills() {
 
   const ref = useGsapScope<HTMLElement>(
     (_ctx, scope) => {
-      if (reduced || !scope) return;
+      // Tanpa pin saat RM maupun layar kecil: konten statis penuh via
+      // CSS fallback (opacity 1 + flow normal). Match rencana 800px CSS.
+      const narrow =
+        typeof window !== "undefined" &&
+        window.matchMedia("(max-width: 800px)").matches;
+      if (reduced || narrow || !scope) return;
       // Judul dalam pin: enter split-char sekali (tanpa toggle — pin yang
       // menempelkan/menghilangkan judul secara natural). Setelah konten
       // masuk, judul mundur (autoAlpha 0.35) agar tak menutupi teks blok;

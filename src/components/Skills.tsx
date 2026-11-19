@@ -1,70 +1,123 @@
-import { skillGroups } from "../content";
 import { useGsapScope } from "../hooks/useGsapScope";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { gsap } from "../lib/gsap";
-import SkillsConstellation from "./SkillsConstellation";
+import { whatIDo } from "../content";
+import SkillRock from "./SkillRock";
 import "./Skills.css";
 
-/* Skills sebagai modul konsol kapal: bukan kartu, bukan progress bar.
-   Setiap modul = baris sistem bernomor dengan readout teks. */
+/* What I Do: 3 blok alternating (Develop batu 3D kiri/teks kanan;
+   Design cermin; Broadcast kiri/teks kanan).
+   Masuk: grow 0.3→1 per blok. Exit blok 1–2: zoom 1→1.35 + fade, scrub
+   reversibel (pola exit About: scrub 0.6 / ease none / fromTo +
+   immediateRender:false). RM → statis penuh, tanpa trigger. */
 
 export default function Skills() {
   const reduced = useReducedMotion();
 
-  const ref = useGsapScope<HTMLElement>(() => {
-    if (reduced) return;
-    gsap.utils.toArray<HTMLElement>(".skills .reveal").forEach((el) => {
-      gsap.fromTo(
-        el,
-        { y: 44, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1.1,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 86%" },
-        },
-      );
-    });
-  }, [reduced]);
+  const ref = useGsapScope<HTMLElement>(
+    (_ctx, scope) => {
+      if (reduced || !scope) return;
+      const blocks = Array.from(scope.querySelectorAll<HTMLElement>(".doing-block"));
+      blocks.forEach((block, i) => {
+        const visual = block.querySelector(".doing-visual");
+        const copy = block.querySelector(".doing-copy");
+        if (visual) {
+          gsap.fromTo(
+            visual,
+            { scale: 0.3, opacity: 0 },
+            {
+              scale: 1,
+              opacity: 1,
+              duration: 1,
+              ease: "power3.out",
+              immediateRender: false,
+              scrollTrigger: { trigger: block, start: "top 78%" },
+            },
+          );
+        }
+        if (copy) {
+          gsap.fromTo(
+            copy,
+            { y: 44, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 1,
+              ease: "power3.out",
+              immediateRender: false,
+              scrollTrigger: { trigger: block, start: "top 78%" },
+            },
+          );
+        }
+        // Exit scrub hanya blok 1–2 (blok 3 = ujung, tak perlu exit).
+        if (i < blocks.length - 1) {
+          gsap.fromTo(
+            block,
+            { scale: 1, opacity: 1 },
+            {
+              scale: 1.35,
+              opacity: 0,
+              ease: "none",
+              duration: 1,
+              immediateRender: false,
+              scrollTrigger: {
+                trigger: block,
+                start: "center 40%",
+                end: "bottom top",
+                scrub: 0.6,
+              },
+            },
+          );
+        }
+      });
+    },
+    [reduced],
+  );
 
   return (
-    <section ref={ref} className="section skills" id="skills" aria-label="Skills">
+    <section ref={ref} className="section skills" id="skills" aria-label="What I do">
       <div className="section-inner">
-        <p className="section-tag reveal">02 // Navigation system</p>
+        <p className="section-tag">02 // Capabilities</p>
 
         <div className="skills-head">
-          <h2 className="display reveal">
-            Ship <em>systems</em>, nominal.
+          <h2 className="display">
+            What I <em>Do</em>
           </h2>
-          <p className="lede reveal">
-            Capability read as instrumentation — grouped by system, no fabricated percentages. What
-            matters is coverage and fluency, not a number.
+          <p className="lede">
+            Three disciplines, one orbit — each with its own instrument. Scroll on: the current
+            instrument grows out of view as the next one takes its place.
           </p>
         </div>
 
-        {/* Elemen G: peta konstelasi interaktif (SVG radial statis). */}
-        <SkillsConstellation />
-
-        <div className="sys-list" role="list">
-          {skillGroups.map((g) => (
-            <article key={g.id} className="sys reveal" role="listitem">
-              <header className="sys-head">
-                <span className="sys-index">{g.index}</span>
-                <h3 className="sys-title">{g.title}</h3>
-                <span className="sys-status" aria-label="System nominal">
-                  <span className="sys-status-dot" aria-hidden="true" />
-                  NOMINAL
-                </span>
-              </header>
-              <p className="sys-items">
-                {g.items.map((item, i) => (
-                  <span key={item} className="sys-item">
-                    <span className="sys-item-n">{String(i + 1).padStart(2, "0")}</span>
-                    {item}
-                  </span>
-                ))}
-              </p>
+        <div className="doing-list">
+          {whatIDo.map((item, i) => (
+            <article
+              key={item.id}
+              className={`doing-block${i % 2 === 1 ? " flip" : ""}`}
+              data-item={item.id}
+            >
+              <div className="doing-visual">
+                {i === 0 ? (
+                  <SkillRock />
+                ) : (
+                  <div className="doing-placeholder" aria-hidden="true">
+                    <span>3D ELEMENT — TBD</span>
+                  </div>
+                )}
+              </div>
+              <div className="doing-copy">
+                <span className="doing-index">{item.index}</span>
+                <h3 className="doing-title">{item.title}</h3>
+                <p className="doing-lede">{item.lede}</p>
+                <p className="doing-items">
+                  {item.items.map((s, j) => (
+                    <span key={s} className="doing-item">
+                      <span className="doing-item-n">{String(j + 1).padStart(2, "0")}</span>
+                      {s}
+                    </span>
+                  ))}
+                </p>
+              </div>
             </article>
           ))}
         </div>

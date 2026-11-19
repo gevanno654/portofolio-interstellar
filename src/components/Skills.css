@@ -1,6 +1,7 @@
-/* Jarak napas pasca-exit About (2026-11-19): exit scrub about berakhir
-   tepat saat skills masuk — tanpa ruang ini judul skills menempel sisa
-   about. Tambahan di atas padding section global; hanya #skills. */
+/* What I Do · 3 blok alternating, masing-masing ~satu viewport.
+   Blok 1 Develop: kiri canvas batu, kanan teks. Blok 2 flip.
+   Jarak napas pasca-exit About dipertahankan (#skills padding). */
+
 #skills {
   padding-top: clamp(3rem, 7vh, 5rem);
 }
@@ -17,82 +18,87 @@
   font-size: var(--step-h2);
 }
 
-/* Modul konsol: garis horizontal penuh, tanpa kartu */
-.sys-list {
-  border-top: 1px solid var(--line);
-}
-
-.sys {
-  border-bottom: 1px solid var(--line);
-  padding: clamp(1.6rem, 3.5vh, 2.4rem) 0;
-  display: grid;
-  grid-template-columns: minmax(14rem, 22rem) 1fr;
-  gap: 1.5rem 3rem;
-  transition: background 0.4s var(--ease-out);
-}
-
-.sys:hover {
-  background: linear-gradient(90deg, rgba(82, 108, 145, 0.08), transparent 60%);
-}
-
-.sys-head {
+.doing-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 }
 
-.sys-index {
+.doing-block {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 2rem 3rem;
+  align-items: center;
+  min-height: 92vh;
+  padding: clamp(2rem, 5vh, 4rem) 0;
+  transform-origin: center center;
+}
+
+.doing-block.flip {
+  grid-template-columns: 1.1fr 1fr;
+}
+
+.doing-block.flip .doing-visual {
+  order: 2;
+}
+
+.doing-block.flip .doing-copy {
+  order: 1;
+}
+
+.doing-visual {
+  min-width: 0;
+}
+
+.doing-copy {
+  min-width: 0;
+}
+
+.doing-index {
   font-family: var(--font-mono);
   font-size: var(--step-micro);
   letter-spacing: 0.3em;
   color: var(--warm-starlight);
 }
 
-.sys-title {
+.doing-title {
   font-family: var(--font-display);
   font-weight: 400;
   font-size: var(--step-h3);
   line-height: 1.15;
+  margin: 0.5rem 0 1rem;
 }
 
-.sys-status {
-  margin-top: auto;
-  padding-top: 1rem;
-  font-family: var(--font-mono);
-  font-size: var(--step-micro);
-  letter-spacing: 0.28em;
-  color: var(--ink-faint);
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
+/* Fallback progresif: bila animasi/RM mati, blok harus tetap terlihat. */
+.doing-visual,
+.doing-copy {
+  opacity: 1;
 }
 
-.sys-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--warm-starlight);
-  box-shadow: 0 0 10px var(--warm-starlight);
+.doing-lede {
+  color: var(--ink-dim);
+  max-width: 34rem;
+  line-height: 1.7;
 }
 
-.sys-items {
+/* Readout teks dengan separator — bukan badge kapsul */
+.doing-items {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem 0;
   align-content: center;
   font-size: clamp(1.05rem, 1.8vw, 1.35rem);
   line-height: 2;
+  margin-top: 1.2rem;
 }
 
-/* Readout teks dengan separator — bukan badge kapsul */
-.sys-item + .sys-item::before {
+.doing-item + .doing-item::before {
   content: "/";
   margin: 0 1.1rem;
   color: var(--stellar-blue);
   opacity: 0.6;
 }
 
-.sys-item-n {
+.doing-item-n {
   font-family: var(--font-mono);
   font-size: var(--step-micro);
   color: var(--ink-faint);
@@ -100,17 +106,38 @@
   vertical-align: super;
 }
 
+/* Placeholder elemen 3D blok 2–3 (diputuskan menyusul). */
+.doing-placeholder {
+  aspect-ratio: 1;
+  min-height: 22rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--line);
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: var(--step-micro);
+  letter-spacing: 0.28em;
+}
+
 @media (max-width: 800px) {
   .skills-head {
     grid-template-columns: 1fr;
   }
 
-  .sys {
+  .doing-block,
+  .doing-block.flip {
     grid-template-columns: 1fr;
+    min-height: auto;
   }
 
-  .sys-status {
-    margin-top: 0;
-    padding-top: 0.4rem;
+  .doing-block.flip .doing-visual,
+  .doing-block .doing-visual {
+    order: -1;
+  }
+
+  .doing-block.flip .doing-copy,
+  .doing-block .doing-copy {
+    order: 0;
   }
 }

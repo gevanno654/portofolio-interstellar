@@ -158,19 +158,10 @@ export default function About() {
           },
           end: "+=300",
           scrub: 0.6,
-          onUpdate: (self) => {
-            const w = window as unknown as { __aboutExitActive?: boolean };
-            if (self.progress <= 0.02) {
-              // Kembali ke awal: lepas kepemilikan (Cosmos pemilik lagi).
-              w.__aboutExitActive = false;
-              exitState.hole = 1;
-              applyHole();
-            } else {
-              // Di dalam rentang ATAU lewat ujung: About pemilik, latch.
-              w.__aboutExitActive = true;
-              applyHole();
-            }
-          },
+          // Bendera + hole dari POLLING posisi (bawah), bukan onUpdate
+          // trigger di sini — trigger mati di luar rentang (tak fire) =
+          // pemilik tak tentu = kedip/lompat. Blok ini sengaja tanpa
+          // onUpdate bendera.
         },
       });
       exitTl
@@ -306,6 +297,36 @@ export default function About() {
     // = teks kembali) — tak perlu reset paksa dari bawah. Reset HANYA
     // saat kembali ke hero (Y≤36, entrance replay dari bersih) atau klik
     // nav (onNavAbout). Diam/turun-naik di sekitar tengah = jangan sentuh.
+    // PEMILIK HOLE dari posisi mentah (revisi 2026-11-19, anti-kedip):
+    // onUpdate trigger MATI di luar rentang = pemilik tak tentu saat
+    // masuk dari skills (bendera basi) = lompat 1→0. Polling ini satu
+    // penulis bendera: Y≤36 hero (Cosmos pemilik, hole 1); 36–start ikut
+    // dissolve (hole 1); dalam rentang ikut tween (applyHole); lewat ujung
+    // hole 0 (D1). startAbs = rumus sama dengan start trigger fungsional.
+    const syncHoleOwner = () => {
+      const y = window.scrollY || 0;
+      const w = window as unknown as { __aboutExitActive?: boolean };
+      const aboutEl = document.getElementById("about");
+      const secH = aboutEl?.offsetHeight || window.innerHeight;
+      const secTop = (aboutEl?.getBoundingClientRect().top ?? 0) + y;
+      const startAbs = secTop - (window.innerHeight - secH) / 2;
+      if (y <= 36) {
+        w.__aboutExitActive = false;
+        exitState.hole = 1;
+        applyHole();
+      } else if (y >= startAbs + 300) {
+        w.__aboutExitActive = true;
+        exitState.hole = 0;
+        applyHole();
+      } else if (y < startAbs) {
+        w.__aboutExitActive = true;
+        exitState.hole = 1;
+        applyHole();
+      } else {
+        w.__aboutExitActive = true;
+        applyHole();
+      }
+    };
     const poll = window.setInterval(() => {
       if (!introPlayed) {
         tryFire();
@@ -313,6 +334,7 @@ export default function About() {
       if (introPlayed && (window.scrollY || 0) <= 36) {
         resetEntrance();
       }
+      syncHoleOwner();
     }, 150);
     // NAV #about: JANGAN reset paksa (revisi 2026-11-19) — klik nav saat
     // teks sudah di tengah me-replay entrance dari nol (opacity 0 → jatuh
